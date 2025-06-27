@@ -8,7 +8,7 @@ wget https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz
 
 tar -xzvf refdata-gex-GRCh38-2020-A.tar.gz
 
-STAR \
+STAR \\
 --runThreadN 16 \
 --runMode genomeGenerate \
 --genomeDir ./ \
