@@ -8,10 +8,8 @@ wget https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz
 
 tar -xzvf refdata-gex-GRCh38-2020-A.tar.gz
 
-STAR \
---runThreadN 16 \
---runMode genomeGenerate \
---genomeDir ./ \
+STAR --runThreadN 16 \
+--runMode genomeGenerate --genomeDir ./ \
 --genomeFastaFiles refdata-gex-GRCh38-2020-A/fasta/genome.fa \
 --sjdbGTFfile      refdata-gex-GRCh38-2020-A/genes/genes.gtf \
 --sjdbOverhang 100
