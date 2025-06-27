@@ -30,7 +30,7 @@ mamba create -n $ENV_NAME -y --file conda_packages_list.txt
 ## Step 2: Installing CellCosmo_UHT software
 ```bash
 # Download the release package
-# Packages under temporary update
+# Packages under temporary update, Unavailable for the time being
 wget https://github.com/10KGenomics/CellCOSMO_UHT/releases/download/v1.1.1/cell_cosmo_uht-1.0.0.tar.gz
 pip install cell_cosmo_uht-1.0.0.tar.gz
 
