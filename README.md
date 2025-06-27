@@ -7,7 +7,7 @@ Ultra-High-Throughput Single-Cell Transcriptomics Technology
    * R scripts
 * Hardware/Software environment
    * x86-64 compatible processors.
-   * require at least 30GB of RAM and 4 CPU.
+   * require at least 40GB of RAM and 4 CPU.
    * centos 7.x 64-bit operating system (Linux kernel 3.10.0, compatible with higher software and hardware configuration).
 # Installation
 Installation tutorial manual [here](docs/install.md)
