@@ -12,29 +12,29 @@ Ultra-High-Throughput Single-Cell Transcriptomics Technology
 # Installation
 Installation tutorial manual [here](docs/install.md)
 
-# Start Running CellCosmo
+# Start Running CellCosmo_UHT
 ## 1. Build References  genomeDir for Homo sapiens or Mus musculus
 Build References genomeDir tutorial manual [here](docs/Build_References_genomeDir.md)
 
-## 2.Generate configuration file(rna_pipeline.cfg)
-Run the following command to get the cfg file:
+## 2.Run pipeline
 ```bash
-CellCosmo rna pipeline -t starsolo -g 
+conda activate CellCosmo_UHT
+script_path=${path}/CellCosmo_UHT
+STARindex=GRCh38_index/
+python ${script_path}/CellCosmo_UHT.py \
+--script_path ${script_path} \
+--SampleName 'nfbmb' \
+--SplitLibrary 'False' \
+--STARindex ${STARindex} \
+--TopCells 8000 \
+--Threads 16 \
+--CB3_Num 1-20 \
+--STARsolo_param '--outReadsUnmapped Fastx --outSAMunmapped Within ' \
+--splitCB "1-192" \
+--splitSample "nfbmb" \
+--splitSample_EstimatedCell_list "3-EstimatedCell_nfbmb.list" \
+--splitSample_EstimatedCellMatrix "nfbmb_filtered_feature_bc_matrix"
 ```
-* Detailed configuration documentation[`rna_starsolo_pipeline.cfg`](docs/rna/rna_pipeline.cfg)
-* If already established References  genomeDir and Kit version1 default, You can apply the simplified version of configuration documentation[`rna_pipeline_sv.cfg`](docs/rna/rna_pipeline_sv.cfg)
-## 3.Run pipeline
-```bash
-CellCosmo rna pipeline -t starsolo -c rna_pipeline.cfg
-```
-
-## 4.Detailed docs can be found in manual
-* (1) Sample sequencing data preparation  
-  [CellCosmo rna sample](docs/rna/sample.md)  
-* (2) Rna alignment
-  [CellCosmo rna starsolo](docs/rna/starsolo.md)
-* (3) Cell cluster and web report result output  
-  [CellCosmo rna analysis](docs/rna/analysis.md)  
 
 # Support
 The officially supported release binaries are available at: (http://www.10kgenomics.com/)
