@@ -1,0 +1,13 @@
+conda-forge::python=3.10.8
+bioconda::star=2.7.10b
+bioconda::parafly=r2013_01_21
+conda-forge::pigz=2.8
+conda-forge::pandas=2.2.3
+anaconda::scipy=1.15.3
+conda-forge::scanpy=1.11.2
+anaconda::openpyxl=3.1.5
+conda-forge::jinja2=3.1.6
+jmcmurray::os=0.1.4
+anaconda::reportlab=3.5.67
+conda-forge::svglib=1.5.1
+conda-forge::cairosvg=2.8.2
