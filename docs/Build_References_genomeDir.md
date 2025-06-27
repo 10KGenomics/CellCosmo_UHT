@@ -1,5 +1,5 @@
 # 参考基因组构建STARindex，以GRCh38为例
-## STARindex=${path}/GRCh38_index
+## STARindex=${Path}/GRCh38_index
 ```bash
 mkdir -p GRCh38_index
 cd GRCh38_index
