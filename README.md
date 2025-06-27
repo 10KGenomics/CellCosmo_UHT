@@ -18,9 +18,18 @@ Build References genomeDir tutorial manual [here](docs/Build_References_genomeDi
 
 ## 2.Run pipeline
 ```bash
+# Activate the Conda environment named "CellCosmo_UHT"
+# This environment contains the required Python packages for the analysis
 conda activate CellCosmo_UHT
+
+# Set the path to the CellCosmo_UHT script directory
+# Replace ${path} with the actual parent directory path
 script_path=${path}/CellCosmo_UHT
+
+# Set the path to the STAR genome index (GRCh38 reference genome)
 STARindex=GRCh38_index/
+
+# Execute the CellCosmo_UHT Python pipeline with specified parameters
 python ${script_path}/CellCosmo_UHT.py \
 --script_path ${script_path} \
 --SampleName 'nfbmb' \
