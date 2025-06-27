@@ -1,11 +1,9 @@
 # 参考基因组构建STARindex，以GRCh38为例，STARindex=${path}/GRCh38_index
 ```bash
 mkdir -p GRCh38_index
-
 cd GRCh38_index
 
 wget https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz
-
 tar -xzvf refdata-gex-GRCh38-2020-A.tar.gz
 
 STAR --runThreadN 16 \
