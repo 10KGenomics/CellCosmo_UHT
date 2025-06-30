@@ -14,7 +14,7 @@ def main():
     parser.add_argument("--script_path", required=True, help="pipeline每步脚本存放路径，比如：/path/CellCosmo_UHT")
     
     # 样本及基础参数
-    parser.add_argument("--SampleName", required=True, help="下机文库名，单个或多个(多个文库名则空格隔开)都可能，比如：'16to1 8to1'")
+    parser.add_argument("--SampleName", required=True, help="下机文库名，单个或多个(多个文库名则空格隔开)都可能，比如：'WT1-1 WT1-2'")
     parser.add_argument("--STARindex", required=True, help="参考基因组STAR index 路径，比如：/path/GRCh38_index")
     parser.add_argument("--TopCells", type=int, required=True, help="CB3单个子文库的强制细胞数,根据实验信息填写，比如：2000")
     parser.add_argument("--Threads", type=int, required=True, help="STARsolo单个任务线程数，比如：16")
@@ -29,7 +29,7 @@ def main():
     
     # STARsolo参数
     parser.add_argument("--ParallelCPU_STARsolo", type=int, default=1, help="STARsolo平行任务数，默认：1")
-    parser.add_argument("--STARsolo_param", help="STARsolo增加参数，比如：--outReadsUnmapped Fastx")
+    parser.add_argument("--STARsolo_param", help="STARsolo增加参数，比如：'--outSAMtype SAM --outReadsUnmapped Fastx'")
     
     # 混样拆分参数
     parser.add_argument("--SplitLibrary", default='False', help="下机多组fastq.gz,实际1个大样本。若单个下机文库名，则填写False；若多个下机文库名，则填写批次名；默认：False")
@@ -38,11 +38,11 @@ def main():
     parser.add_argument("--splitSample", required=True, help="混样拆分后的样本名列表,比如：'A B C'")
     parser.add_argument("--splitSample_EstimatedCell_list", required=True, help="各样本预估细胞数列表文件,与splitSample对应数目，比如：'4-EstimatedCell_A.list 4-EstimatedCell_B.list  4-EstimatedCell_C.list'")
     parser.add_argument("--splitSample_EstimatedCellMatrix", required=True, help="各样本矩阵文件前缀,与splitSample对应数目，比如：'A_filtered_feature_bc_matrix B_filtered_feature_bc_matrix C_filtered_feature_bc_matrix'")
-    
     args = parser.parse_args()
 
-    # # 初始化环境
+    # 初始化环境
     subprocess.run(f"mkdir -p log/", shell=True)
+    subprocess.run(f"mkdir -p ParaFly/", shell=True)
     # os.makedirs("log", exist_ok=True)
     # print("===== 环境初始化完成 =====")
 
@@ -70,35 +70,34 @@ def main():
     star_logs = glob.glob("02-STARsolo/*-Log.final.out")
     if not star_logs:
         if args.STARsolo_param:
+            # 正确构建命令参数，不使用shell=True
             cmd = [
-                f"nohup bash {args.script_path}/scripts/STARsolo.sh",
+                "nohup", "bash", f"{args.script_path}/scripts/STARsolo.sh",
                 args.STARindex,
                 str(args.TopCells),
                 str(args.Threads),
                 args.CB3_Num,
                 str(args.ParallelCPU_STARsolo),
                 args.script_path,
-                f"> log/out-02.STARsolo.log"
+                args.STARsolo_param
             ]
-            args.STARsolo_param = str(args.STARsolo_param).lstrip(
-                "'").lstrip('"').rstrip("'").rstrip('"')
-            cmd += (" " + args.STARsolo_param)
-
-            subprocess.run(" ".join(cmd), shell=True)
+            # 处理日志重定向
             print(f"STARsolo已启动，已设置增设STARsolo参数: {args.STARsolo_param}，日志见 log/out-02.STARsolo.log")
+            with open("log/out-02.STARsolo.log", "w") as log_file:
+                subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT, shell=False)
         else:
             cmd = [
-                f"nohup bash {args.script_path}/scripts/STARsolo.sh",
+                "nohup", "bash", f"{args.script_path}/scripts/STARsolo.sh",
                 args.STARindex,
                 str(args.TopCells),
                 str(args.Threads),
                 args.CB3_Num,
                 str(args.ParallelCPU_STARsolo),
-                args.script_path,
-                f"> log/out-02.STARsolo.log"
+                args.script_path
             ]
-            subprocess.run(" ".join(cmd), shell=True)
             print("STARsolo已启动，日志见 log/out-02.STARsolo.log")
+            with open("log/out-02.STARsolo.log", "w") as log_file:
+                subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT, shell=False)
     else:
         print("检测到已存在STARsolo结果，跳过此步骤")
 
@@ -297,7 +296,6 @@ def main():
     except subprocess.CalledProcessError as e:
         print(f"执行sed命令失败: {str(e)}")
         sys.exit(1)
-
     # subprocess.run([
     #     "sed", "-i",
     #     "1iCB\tcbMatch\tcbPerfect\tcbMMunique\tcbMMmultiple\tgenomeU\tgenomeM\tfeatureU\tfeatureM\texonic\tintronic\texonicAS\tintronicAS\tmito\tcountedU\tcountedM\tnUMIunique\tnGenesUnique\tnUMImulti\tnGenesMulti",
