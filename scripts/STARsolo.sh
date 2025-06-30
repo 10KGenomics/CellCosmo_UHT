@@ -17,6 +17,7 @@ Threads=${3}
 CB3_Num=${4}
 # STARsolo 平行任务数，默认1，需结合线程数设定
 ParallelCPU_Step1=${5}
+# STARsolo增设参数
 STARsolo_param=${7}
 
 # 选取CB3的CB list
@@ -66,19 +67,15 @@ Scripts/Barcode/CB3/${CBID}.list \
 --soloBarcodeReadLength 0 \
 --outFileNamePrefix 02-STARsolo/${Sample}_${CBID}- \
 --runThreadN ${Threads} \
---outSAMtype SAM \
---outSAMunmapped Within \
 --soloFeatures Gene GeneFull_Ex50pAS Velocyto \
 --readFilesCommand zcat \
 --outFilterMatchNmin 0 \
 --outFilterScoreMinOverLread 0.33 \
 --outFilterMatchNminOverLread 0.33 \
-${STARsolo_param} \n">>\
+${STARsolo_param} ">>\
 ParaFly/02-STARsolo.sh
 done
-wait
 done
-wait
 else
 for Sample in $(cat Sample)
 do
@@ -111,12 +108,10 @@ Scripts/Barcode/CB3/${CBID}.list \
 --readFilesCommand zcat \
 --outFilterMatchNmin 0 \
 --outFilterScoreMinOverLread 0.33 \
---outFilterMatchNminOverLread 0.33 \n">>\
+--outFilterMatchNminOverLread 0.33 ">>\
 ParaFly/02-STARsolo.sh
 done
-wait
 done
-wait
 fi
 date
 
@@ -133,3 +128,6 @@ done
 wait
 date
 echo 'Step2.STARsolo is finished !'
+
+# --outSAMtype SAM \
+# --outSAMunmapped Within \

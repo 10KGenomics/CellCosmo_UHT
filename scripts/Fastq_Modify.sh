@@ -27,12 +27,12 @@ python ${6}/Fastq_Modify.py \
 --cut_R2_length ${4} \
 --output_R1 01-Fastq_Modify_ParaFly/${Sample}_R1.fastq.gz \
 --output_R2 01-Fastq_Modify_ParaFly/${Sample}_R2.fastq.gz \
---batch_size  1000 \n">>\
+--batch_size  1000 ">>\
 ParaFly/01-Fastq_Modify_ParaFly.sh
 done
 wait
-
 date
+
 echo 'Start Step1.Fastq_Modfy python!'
 for i in 01-Fastq_Modify_ParaFly
 do
