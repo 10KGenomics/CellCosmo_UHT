@@ -32,17 +32,22 @@ STARindex=GRCh38_index/
 # Execute the CellCosmo_UHT Python pipeline with specified parameters
 python ${script_path}/CellCosmo_UHT.py \
 --script_path ${script_path} \
---SampleName 'nfbmb' \
---SplitLibrary 'False' \
---STARindex ${STARindex} \
---TopCells 8000 \
---Threads 16 \
---CB3_Num 1-20 \
---STARsolo_param '--outReadsUnmapped Fastx --outSAMunmapped Within ' \
---splitCB "1-192" \
---splitSample "nfbmb" \
---splitSample_EstimatedCell_list "3-EstimatedCell_nfbmb.list" \
---splitSample_EstimatedCellMatrix "nfbmb_filtered_feature_bc_matrix"
+--Rawdata_path ./0-data \
+--SampleName 'JS21' \
+--CB3_Num '1-21' \
+--STARindex /home/rs1/2-reference_genome/mm10/STAR_CellCosmo \
+--TopCells 2000 \
+--STARsoloThreads 4 \
+--SplitcodeNum 21 \
+--nFastqs 2 \
+--soloFeatures 'GeneFull_Ex50pAS Velocyto' \
+--STARsolo_param '--outReadsUnmapped Fastx' \
+--outRaw True \
+--Summary summary.txt \
+--Mapping mapping.txt \
+--LogFile log.txt \
+--splitCB "[0,88,8] [1,89,8] [2,90,8] [3,91,8] [4,92,8] [5,93,8] [6,94,8] [7,95,8]" \
+--splitSample "A A1 B B1 C C1 D B3"
 ```
 
 # Support
