@@ -47,8 +47,8 @@ git clone https://github.com/10KGenomics/CellCosmo_UHT.git
 # Activate the Conda environment (replace $ENV_NAME with the actual environment name)
 conda activate $ENV_NAME
 
-# 设置目标安装路径,CellCosmo_UHT环境的bin中
-TARGET_DIR="/home/rs1/1-software/miniconda3-24/envs/CellCosmo_UHT"
+# splitcode设置目标安装路径,CellCosmo_UHT环境的bin中
+TARGET_DIR="${CellCosmo_UHT_conda_path}/CellCosmo_UHT"
 
 # 下载和解压 splitcode
 wget https://github.com/pachterlab/splitcode/archive/refs/tags/v0.31.3.tar.gz
@@ -62,7 +62,12 @@ mkdir build
 cd build
 
 # 设置编译环境，gcc-env需要详细安装细节
+conda create -n gcc-env -y
 conda activate gcc-env
+conda install -c conda-forge cmake=3.28.0 -y
+conda install -c conda-forge gcc_linux-64 -y
+conda install -c conda-forge gxx_linux-64 -y
+conda install -c conda-forge zlib -y
 export CC=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc
 export CXX=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
 export CFLAGS="-D_GNU_SOURCE"
