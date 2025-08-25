@@ -90,7 +90,7 @@ fi
 
 # Run the CellCosmo_UHT script with the `-h` flag to display help documentation
 # This shows available parameters and usage instructions for the pipeline
-cd ../../
+cd ../../../
 python CellCosmo_UHT/CellCosmo_UHT.py -h
 ```
 
