@@ -29,16 +29,20 @@ script_path=${path}/CellCosmo_UHT
 # Set the path to the STAR genome index (GRCh38 reference genome)
 STARindex=GRCh38_index/
 
+work path:
+0-data/test1_R1.fastq.gz
+0-data/test1_R2.fastq.gz
+
 # Execute the CellCosmo_UHT Python pipeline with specified parameters
 python ${script_path}/CellCosmo_UHT.py \
 --script_path ${script_path} \
 --Rawdata_path ./0-data \
---SampleName 'JS21' \
---CB3_Num '1-21' \
---STARindex /home/rs1/2-reference_genome/mm10/STAR_CellCosmo \
---TopCells 2000 \
---STARsoloThreads 4 \
---SplitcodeNum 21 \
+--SampleName 'test1' \
+--CB3_Num '1-20' \
+--STARindex /path/GRCh38_index \
+--TopCells 3000 \
+--STARsoloThreads 2 \
+--SplitcodeNum 10 \
 --nFastqs 2 \
 --soloFeatures 'GeneFull_Ex50pAS Velocyto' \
 --STARsolo_param '--outReadsUnmapped Fastx' \
@@ -47,7 +51,7 @@ python ${script_path}/CellCosmo_UHT.py \
 --Mapping mapping.txt \
 --LogFile log.txt \
 --splitCB "[0,88,8] [1,89,8] [2,90,8] [3,91,8] [4,92,8] [5,93,8] [6,94,8] [7,95,8]" \
---splitSample "A A1 B B1 C C1 D B3"
+--splitSample "A B C D E F G H"
 ```
 
 # Support
