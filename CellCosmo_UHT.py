@@ -64,7 +64,6 @@ def main():
     if not args.splitSample_EstimatedCellMatrix:
         args.splitSample_EstimatedCellMatrix = " ".join(f"{s}_filtered_feature_bc_matrix" for s in samples)
     
-    # 打印验证生成的参数
     print(f"生成的参数值:")
     print(f"splitSample_EstimatedCell_list: {args.splitSample_EstimatedCell_list}")
     print(f"splitSample_RawCell_list: {args.splitSample_RawCell_list}")
@@ -77,12 +76,10 @@ def main():
     # parser.add_argument("--splitSample_RawCell_list", required=True, help="各样本原始细胞数列表文件,与splitSample对应数目，比如：'4-RawCell_A.list 4-RawCell_B.list  4-RawCell_C.list'")
     # parser.add_argument("--splitSample_EstimatedCellMatrix", required=True, help="各样本矩阵文件前缀,与splitSample对应数目，比如：'A_filtered_feature_bc_matrix B_filtered_feature_bc_matrix C_filtered_feature_bc_matrix'")
 
-    # 初始化环境
     subprocess.run(f"mkdir -p log/", shell=True)
     os.makedirs("log", exist_ok=True)
     print("===== 环境初始化完成 =====")
 
-    # ------------------------ 步骤1：Generate lib处理 ------------------------
     print("\n===== 开始 Generate lib 处理 =====")
     fastq_files = glob.glob("log/10K_lib")
     if not fastq_files:
@@ -96,12 +93,9 @@ def main():
     else:
         print("检测到已存在Generate lib处理结果，跳过此步骤")
 
-    # ------------------------ 步骤2：STARsolo分析 ------------------------
     print("\n===== 开始 STARsolo 分析 =====")
     star_logs = glob.glob("02-STARsolo/star_outs_lib*/Log.final.out")
     if not star_logs:
-        # 正确获取输入文件路径（支持通配符）
-        # 将匹配到的文件列表转换为空格分隔的字符串
         input_r1 = ' '.join(glob.glob(f"{args.Rawdata_path}/{args.SampleName}_*1.f*q.gz"))
         input_r2 = ' '.join(glob.glob(f"{args.Rawdata_path}/{args.SampleName}_*2.f*q.gz"))
 
@@ -124,7 +118,6 @@ def main():
             "--LogFile", args.LogFile
         ]
 
-        # 添加可选参数
         if args.STARsolo_param:
             cmd_base.extend(["--STARsolo_param", args.STARsolo_param])
     
@@ -134,35 +127,28 @@ def main():
     else:
         print("检测到已存在STARsolo结果，跳过此步骤")
 
-    # ------------------------ 步骤3：细胞读数汇总 ------------------------
     print("\n===== 开始 细胞读数汇总 =====")
     os.makedirs("03-CellReadsSummary", exist_ok=True)
 
-    # 使用glob安全获取样本列表
     star_dirs = glob.glob("02-STARsolo/star_outs_lib*")
     samples = []
     for d in star_dirs:
-        # 从目录名中提取样本编号
         if "star_outs_lib" in d:
-            # 提取lib后面的数字部分
             parts = d.split("star_outs_lib")
             if len(parts) > 1:
                 sample_id = parts[-1].split("/")[0]
                 if sample_id.isdigit():
                     samples.append(sample_id)
 
-    # 按数字排序
     samples.sort(key=int)
     print(f"找到 {len(samples)} 个样本: {samples}")
 
     for sample in samples:
         print(f"\n处理样本: {sample}")
     
-        # 构建文件路径
         cellreads_path = f"02-STARsolo/star_outs_lib{sample}/Solo.out/GeneFull_Ex50pAS/CellReads.stats"
         summary_path = f"02-STARsolo/star_outs_lib{sample}/Solo.out/GeneFull_Ex50pAS/Summary.csv"
     
-        # 检查文件是否存在
         if not os.path.exists(cellreads_path):
             print(f"警告: 文件 {cellreads_path} 不存在，跳过")
             continue  
@@ -197,13 +183,11 @@ def main():
 
     print("细胞读数汇总完成")
 
-    # ------------------------ 步骤4：矩阵文件更名 ------------------------
     print("\n===== 开始 矩阵文件更名 =====")
     os.makedirs("04-CB3_Matrix/raw", exist_ok=True)
     os.makedirs("04-CB3_Matrix/filtered", exist_ok=True)
     
     for sample in samples:
-        # 复制文件
         subprocess.run([
             "cp", "-r",
             f"02-STARsolo/star_outs_lib{sample}/Solo.out/GeneFull_Ex50pAS/raw",
@@ -215,7 +199,6 @@ def main():
             f"04-CB3_Matrix/filtered/{sample}_filtered_feature_bc_matrix"
         ])
         
-        # 压缩文件
         pigz_cmds = []
         for dir_type in ["raw", "filtered"]:
             for f in ["matrix.mtx", "features.tsv", "barcodes.tsv"]:
@@ -226,7 +209,6 @@ def main():
             cmd.wait()
     print("矩阵文件处理完成")
 
-    # ------------------------ 步骤5：合并子文库汇总 ------------------------
     print("\n===== 开始 子文库汇总合并 =====")
     os.makedirs("05-Combined", exist_ok=True)
     summary_files = " ".join(glob.glob("03-CellReadsSummary/*-Summary.xls"))
@@ -238,7 +220,6 @@ def main():
     )
     print("子文库汇总完成")
 
-    # ------------------------ 步骤6：合并CB3子文库 ------------------------
     print("\n===== 开始 CB3子文库合并 =====")
     cellreads_files = " ".join(glob.glob("02-STARsolo/star_outs_lib*/Solo.out/GeneFull_Ex50pAS/CellReads.stats"))
     matrix_dirs = " ".join(glob.glob("04-CB3_Matrix/filtered/*_filtered_feature_bc_matrix"))
@@ -258,11 +239,9 @@ def main():
 
     print("CB3合并完成")
 
-    # ------------------------ 步骤7：CB2混样拆分 ------------------------
     print("\n===== 开始 CB2混样拆分 =====")
     os.makedirs("06-CB2_Sample", exist_ok=True)
 
-    # 始终执行filtered拆分
     matrix_paths_filtered = " ".join(glob.glob("04-CB3_Matrix/filtered/*_filtered_feature_bc_matrix"))
     subprocess.run(
         f"python {args.script_path}/scripts/CellNum.py "
@@ -277,9 +256,7 @@ def main():
     )
     print("filtered CB2拆分完成")
 
-    # 根据outRaw参数决定是否执行raw拆分
     if args.outRaw == 'True':
-        # 只有当outRaw=True时，才执行以下代码
         matrix_paths_raw = " ".join(glob.glob("04-CB3_Matrix/raw/*_raw_feature_bc_matrix"))
         subprocess.run(
             f"python {args.script_path}/scripts/CellNum.py "
@@ -294,12 +271,10 @@ def main():
         )
         print("raw CB2拆分完成")
 
-    # ------------------------ 步骤8：生成H5ad文件 ------------------------
     print("\n===== 开始 生成H5ad文件 =====")
     os.makedirs("04-CB3_Matrix/filtered_AddName", exist_ok=True)
     os.makedirs("04-CB3_Matrix/raw_AddName", exist_ok=True)
     
-    # 修改Barcode名称
     subprocess.run(
         f"python {args.script_path}/scripts/ModifyBarcodeName.py "
         f"--ModifyBarcodeName True "
@@ -317,7 +292,6 @@ def main():
         check=True
     )
 
-    # 生成filtered H5ad
     subprocess.run(
         f"python {args.script_path}/scripts/Scanpy_T.py "
         f"--inputMatrixDir 04-CB3_Matrix/filtered_AddName "
@@ -330,7 +304,6 @@ def main():
     )
     print("filtered H5ad生成完成")
 
-    # 根据outRaw参数决定是否生成raw H5ad
     if args.outRaw == 'True':
         subprocess.run(
             f"python {args.script_path}/scripts/Scanpy_T.py "
@@ -344,13 +317,11 @@ def main():
         )
         print("Raw H5ad生成完成")
 
-    # ------------------------ 步骤9：转换为10X矩阵 ------------------------
     print("\n===== 开始 转换为10X矩阵 =====")
     os.makedirs("07-CB2_Matrix", exist_ok=True)
-    samples_split = args.splitSample.split()  # 只定义一次
+    samples_split = args.splitSample.split()  
 
-    # 处理filtered矩阵转换
-    processes_filtered = []  # 使用特定变量名
+    processes_filtered = []  
     for sample in samples_split:
         p = subprocess.Popen([
             "python", f"{args.script_path}/scripts/H5adto10X.py",
@@ -362,10 +333,9 @@ def main():
         p.wait()
     print("10X filtered 矩阵转换完成")
 
-    # 根据outRaw参数决定是否处理raw矩阵转换
     if args.outRaw == 'True':
-        processes_raw = []  # 使用特定变量名
-        for sample in samples_split:  # 使用上面已定义的samples_split
+        processes_raw = []  
+        for sample in samples_split:  
             p = subprocess.Popen([
                 "python", f"{args.script_path}/scripts/H5adto10X.py",
                 f"06-CB2_Sample/raw/{sample}_raw.h5ad",
@@ -376,7 +346,6 @@ def main():
             p.wait()
         print("10X raw 矩阵转换完成")
 
-    # ------------------------ 步骤10：添加SampleID到汇总表 ------------------------
     print("\n===== 开始 添加SampleID到汇总表 =====")
     # 预处理表格
     file_path = "05-Combined/2-Cell_Summary.xls"
@@ -387,20 +356,18 @@ def main():
     # 读取文件第一行并处理
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
-            first_line = f.readline().strip()  # 读取第一行并去除首尾空白
+            first_line = f.readline().strip()  
     except Exception as e:
         print(f"ERROR: 读取文件失败: {str(e)}", file=sys.stderr)
         sys.exit(1)
     
-    # 检查第一行第一列是否为"CB"
     insert_header = True
     if first_line:
-        first_column = first_line.split('\t')[0]  # 按制表符分割后取第一列
+        first_column = first_line.split('\t')[0]  
         if first_column == "CB":
             print("第一列已为'CB'，跳过插入表头操作")
             insert_header = False
 
-    # 如果需要，执行sed插入表头命令
     if insert_header:
         try:
             subprocess.run(
@@ -417,7 +384,6 @@ def main():
             print(f"ERROR: 执行sed命令失败: {str(e)}", file=sys.stderr)
             sys.exit(1)
 
-    # 生成Modify文件（关键步骤：无论是否插入表头，都需要执行）
     try:
         subprocess.run(
             f"cut -f 1,2,6,7,15,17,18 "
@@ -433,15 +399,12 @@ def main():
         print(f"ERROR: 执行cut命令失败: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
-    # 检查Modify文件是否生成
     modify_file = "05-Combined/2-Cell_Summary_Modify.xls"
     if not os.path.exists(modify_file) or os.path.getsize(modify_file) == 0:
         print(f"ERROR: 生成的 {modify_file} 不存在或为空", file=sys.stderr)
         sys.exit(1)
 
-    # 运行AddSampleID.py（关键修复：确保命令正确执行）
     try:
-        # 构建命令列表，避免shell解析问题
         cmd = [
             "python", f"{args.script_path}/scripts/AddSampleID.py",
             "--inputfile", "05-Combined/2-Cell_Summary_Modify.xls",
@@ -451,10 +414,8 @@ def main():
             "--output", "05-Combined/2-Cell_Summary_withSampleID.xls"
         ]
         
-        # 打印命令用于调试
         print(f"执行命令: {' '.join(cmd)}")
         
-        # 执行命令
         subprocess.run(
             cmd,
             check=True,
@@ -467,18 +428,15 @@ def main():
         print(f"ERROR: 执行AddSampleID.py失败: {e.stderr}", file=sys.stderr)
         sys.exit(1)
 
-    # 检查结果文件是否生成
     result_file = "05-Combined/2-Cell_Summary_withSampleID.xls"
     if not os.path.exists(result_file) or os.path.getsize(result_file) == 0:
         print(f"ERROR: 结果文件 {result_file} 未生成或为空", file=sys.stderr)
         sys.exit(1)
 
-    # ------------------------ 步骤11：混样统计汇总 ------------------------
     print("\n===== 开始 混样统计汇总 =====")
     os.makedirs("08-Sample_Summary", exist_ok=True)
     cellreads_all = " ".join(glob.glob("02-STARsolo/star_outs_lib*/Solo.out/GeneFull_Ex50pAS/CellReads.stats"))
     
-    # 注意：原脚本中缺少args.splitSample_EstimatedCellMatrix参数定义，这里暂时保留原逻辑
     try:
         subprocess.run(
             f"python {args.script_path}/scripts/SampleID_split.py "
@@ -519,7 +477,6 @@ def main():
 
     print("混样统计完成")
 
-    # ------------------------ 步骤12：生成报告 ------------------------
     try:
         subprocess.run(f"python {args.script_path}/scripts/Report_html.py", shell=True, check=True)
         print("\n===== 10K 超高通量单细胞转录组分析报告已生成！ =====")
