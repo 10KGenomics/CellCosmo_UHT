@@ -45,7 +45,6 @@ python ${script_path}/CellCosmo_UHT.py \
 --SplitcodeNum 10 \
 --nFastqs 2 \
 --soloFeatures 'GeneFull_Ex50pAS Velocyto' \
---STARsolo_param '--outReadsUnmapped Fastx' \
 --outRaw True \
 --Summary summary.txt \
 --Mapping mapping.txt \
