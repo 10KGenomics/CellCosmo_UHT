@@ -6,7 +6,7 @@
 wget https://github.com/10KGenomics/CellCosmo_UHT/blob/main/conda_packages_list.txt
 # conda_packages_list.txt file
 conda-forge::python=3.10.8
-bioconda::star=2.7.10b
+bioconda::star=2.7.11a
 bioconda::parafly=r2013_01_21
 conda-forge::pigz=2.8
 conda-forge::pandas=2.2.3
